@@ -1,0 +1,41 @@
+{
+  "name": "pi-ez-chat-remote-command",
+  "version": "0.1.0",
+  "description": "Shared remote slash-command matcher for pi-ez pi-chat extensions.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi-chat",
+    "discord",
+    "slash-command"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bry-guy/pi-ez-chat-remote-command.git"
+  },
+  "homepage": "https://github.com/bry-guy/pi-ez-chat-remote-command#readme",
+  "bugs": {
+    "url": "https://github.com/bry-guy/pi-ez-chat-remote-command/issues"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "tsx --test test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
