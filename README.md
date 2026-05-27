@@ -1,13 +1,15 @@
-# pi-ez-chat-remote-command
+# pi-ez-lib
 
-Shared matcher for pi-ez pi-chat extension input hooks.
+Shared utility library for pi-ez packages and pi-chat extensions.
 
-It recognizes remote slash commands in the shapes pi-chat/Discord workers currently pass to extension `input` hooks:
+Current exports include a remote slash-command matcher for extension `input` hooks. It recognizes the shapes pi-chat/Discord workers currently pass through:
 
 - `/chat-git status`
 - `<@bot> /chat-git status`
 - `/chat-git status <@bot>`
 - `- [time] [uid:...] user: <@bot> /chat-git status`
+
+This package is a library only; it does not register any pi extensions or slash commands by itself.
 
 ## Development
 
@@ -15,4 +17,5 @@ It recognizes remote slash commands in the shapes pi-chat/Discord workers curren
 npm install
 npm test
 npm run typecheck
+npm run build
 ```

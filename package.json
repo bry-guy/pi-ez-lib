@@ -1,7 +1,7 @@
 {
-  "name": "pi-ez-chat-remote-command",
-  "version": "0.1.1",
-  "description": "Shared remote slash-command matcher for pi-ez pi-chat extensions.",
+  "name": "pi-ez-lib",
+  "version": "0.1.2",
+  "description": "Shared utility library for pi-ez packages and pi-chat extensions.",
   "license": "MIT",
   "type": "module",
   "keywords": [
@@ -12,11 +12,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bry-guy/pi-ez-chat-remote-command.git"
+    "url": "git+https://github.com/bry-guy/pi-ez-lib.git"
   },
-  "homepage": "https://github.com/bry-guy/pi-ez-chat-remote-command#readme",
+  "homepage": "https://github.com/bry-guy/pi-ez-lib#readme",
   "bugs": {
-    "url": "https://github.com/bry-guy/pi-ez-chat-remote-command/issues"
+    "url": "https://github.com/bry-guy/pi-ez-lib/issues"
   },
   "exports": {
     ".": {
