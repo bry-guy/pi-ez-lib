@@ -31,13 +31,14 @@ export function normalizeRemoteCommandText(text: string): string {
 }
 
 function candidatesFor(text: string): string[] {
-  // Discord transcript payloads may contain multiple forwarded lines. Matching the
-  // whole block first can pollute a command's args with later transcript bullets
-  // (e.g. `/chat-thread restart\n- [...] /chat-unmount-all`, where `-` then
-  // looks like an unknown flag). For multi-line input, match individual lines.
-  const pieces = /\r?\n/u.test(text) ? text.split(/\r?\n/u).reverse() : [text];
-  const candidates = pieces.map(normalizeRemoteCommandText).filter(Boolean);
-  return [...new Set(candidates)];
+  // pi-chat may hand extensions a transcript-shaped block, not just the latest
+  // Discord message. Older slash commands in that block must not replay on later
+  // non-command turns. Therefore, for multi-line input only the latest non-empty
+  // normalized line is eligible for command matching.
+  const pieces = /\r?\n/u.test(text) ? text.split(/\r?\n/u) : [text];
+  const normalized = pieces.map(normalizeRemoteCommandText).filter(Boolean);
+  const latest = normalized.at(-1);
+  return latest ? [latest] : [];
 }
 
 export function matchSlashCommand(text: string, aliases: readonly string[]): CommandMatch | undefined {
