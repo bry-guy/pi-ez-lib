@@ -31,7 +31,12 @@ export function normalizeRemoteCommandText(text: string): string {
 }
 
 function candidatesFor(text: string): string[] {
-  const candidates = [text, ...text.split(/\r?\n/u)].map(normalizeRemoteCommandText).filter(Boolean);
+  // Discord transcript payloads may contain multiple forwarded lines. Matching the
+  // whole block first can pollute a command's args with later transcript bullets
+  // (e.g. `/chat-thread restart\n- [...] /chat-unmount-all`, where `-` then
+  // looks like an unknown flag). For multi-line input, match individual lines.
+  const pieces = /\r?\n/u.test(text) ? text.split(/\r?\n/u) : [text];
+  const candidates = pieces.map(normalizeRemoteCommandText).filter(Boolean);
   return [...new Set(candidates)];
 }
 
