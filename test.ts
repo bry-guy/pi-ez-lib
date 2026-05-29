@@ -15,11 +15,12 @@ test("matches transcript-shaped Discord forwarded lines", () => {
   assert.equal(normalizeRemoteCommandText("- [2026-05-27T15:01:05.371Z] [uid:235246238382030849] prettybry: hello"), "hello");
 });
 
-test("matches multi-line transcripts line-by-line", () => {
+test("matches multi-line transcripts line-by-line and prefers latest matching line", () => {
   const transcript = [
     "- [2026-05-27T15:01:05.371Z] [uid:235246238382030849] prettybry: <@1496161074997624843> /chat-thread restart",
     "- [2026-05-27T15:01:10.371Z] [uid:235246238382030849] prettybry: <@1496161074997624843> /chat-unmount-all",
+    "- [2026-05-27T15:01:12.371Z] [uid:235246238382030849] prettybry: <@1496161074997624843> /chat-thread stop",
   ].join("\n");
-  assert.deepEqual(matchSlashCommand(transcript, ["chat-thread"]), { name: "chat-thread", args: "restart" });
+  assert.deepEqual(matchSlashCommand(transcript, ["chat-thread"]), { name: "chat-thread", args: "stop" });
   assert.deepEqual(matchSlashCommand(transcript, ["chat-unmount-all"]), { name: "chat-unmount-all", args: "" });
 });
