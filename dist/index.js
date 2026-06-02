@@ -1,3 +1,4 @@
+export const CHAT_VM_RESTART_HINT = "Restart via `/new` for changes to take effect.";
 const mentionPattern = String.raw `(?:<@!?\d+>|<@&\d+>|@[\w.-]+)`;
 const leadingMentionPattern = new RegExp(String.raw `^${mentionPattern}\s*`, "u");
 const trailingMentionPattern = new RegExp(String.raw `\s*${mentionPattern}\s*$`, "u");
@@ -26,8 +27,14 @@ export function normalizeRemoteCommandText(text) {
     return stripTrailingMention(stripLeadingMention(stripTranscriptPrefix(text))).trim();
 }
 function candidatesFor(text) {
-    const candidates = [text, ...text.split(/\r?\n/u)].map(normalizeRemoteCommandText).filter(Boolean);
-    return [...new Set(candidates)];
+    // pi-chat may hand extensions a transcript-shaped block, not just the latest
+    // Discord message. Older slash commands in that block must not replay on later
+    // non-command turns. Therefore, for multi-line input only the latest non-empty
+    // normalized line is eligible for command matching.
+    const pieces = /\r?\n/u.test(text) ? text.split(/\r?\n/u) : [text];
+    const normalized = pieces.map(normalizeRemoteCommandText).filter(Boolean);
+    const latest = normalized.at(-1);
+    return latest ? [latest] : [];
 }
 export function matchSlashCommand(text, aliases) {
     for (const stripped of candidatesFor(text)) {

@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { matchSlashCommand, normalizeRemoteCommandText, stripLeadingMention } from "./src/index.js";
+import { CHAT_VM_RESTART_HINT, matchSlashCommand, normalizeRemoteCommandText, stripLeadingMention } from "./src/index.js";
+
+test("exports shared restart hint", () => {
+  assert.equal(CHAT_VM_RESTART_HINT, "Restart via `/new` for changes to take effect.");
+});
 
 test("matches clean and mention-wrapped slash commands", () => {
   assert.equal(stripLeadingMention("  @bot /chat-thread hi"), "/chat-thread hi");

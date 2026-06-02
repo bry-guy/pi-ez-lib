@@ -1,6 +1,6 @@
 {
   "name": "pi-ez-lib",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Shared utility library for pi-ez packages and pi-chat extensions.",
   "license": "MIT",
   "type": "module",

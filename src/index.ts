@@ -1,5 +1,7 @@
 export type CommandMatch = { name: string; args: string };
 
+export const CHAT_VM_RESTART_HINT = "Restart via `/new` for changes to take effect.";
+
 const mentionPattern = String.raw`(?:<@!?\d+>|<@&\d+>|@[\w.-]+)`;
 const leadingMentionPattern = new RegExp(String.raw`^${mentionPattern}\s*`, "u");
 const trailingMentionPattern = new RegExp(String.raw`\s*${mentionPattern}\s*$`, "u");
