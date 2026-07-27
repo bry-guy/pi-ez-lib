@@ -30,12 +30,15 @@ Linked downstream:
 
 **Target:** `@earendil-works/pi-chat`
 
-**2026-06-05 fork status:** item 3 is patched in
-`bry-guy/pi-chat` commit `5237e18` by handling remote `/new` directly
-instead of injecting `/chat-new` as a follow-up user message. Command
-contexts still use `ctx.newSession`; remote event contexts fall back to a
-narrow `SessionManager.newSession` call and re-append the pi-chat
-conversation binding. Items 1 and 2 remain open.
+**2026-06-06 fork status:** `pi-ez-lib` now exposes
+`scheduleCurrentPiChatWorkerRespawn()`, a safer tmux workaround that respawns
+the current pane with an explicit `pi --session ... --session-dir ...
+--chat-conversation ...` command. That preserves the current pi session file
+and pi-chat conversation binding across the Gondolin VM restart. Item 3 was
+patched in `bry-guy/pi-chat` commit `5237e18` by handling remote `/new`
+directly instead of injecting `/chat-new` as a follow-up user message. Items
+1 and 2 remain open because the tmux respawn is still a workaround rather
+than a first-class in-process VM recreation API.
 
 **Problem.** Several `pi-ez-*` extensions change per-conversation config that
 Gondolin only re-reads at `VM.create` time (`pi-ez-chat-mount`,
@@ -44,18 +47,18 @@ Gondolin only re-reads at `VM.create` time (`pi-ez-chat-mount`,
 the current pi-chat sandbox from inside the VM. Today the workarounds are:
 
 - ask the user to type `@bot /new` in the channel, or
-- have the extension call `tmux respawn-pane -k -t $TMUX_PANE`.
+- schedule a tmux pane respawn after the command reply is emitted.
 
-The second workaround is what every `pi-ez-chat-*` package historically did.
-It only works when the pane was originally spawned by pi-chat's
-`/chat-spawn-all` worker (`exec pi --session … --chat-conversation …`). In
-the main thread, where the user ran `pi` interactively from a regular shell
-pane and then `/chat-connect`-ed, `respawn-pane -k` kills the running `pi`
-process and re-execs the pane's *original* start command — usually the
-user's shell — which crashes pi-chat and disconnects the chat. As of this
-writing, all `pi-ez-chat-*` packages have removed their tmux-respawn paths
-and now just print the shared
-``Restart via `/new` for changes to take effect.`` hint.
+The unsafe historical version called `tmux respawn-pane -k -t $TMUX_PANE`
+without an explicit command. That only worked when the pane was originally
+spawned by pi-chat's `/chat-spawn-all` worker (`exec pi --session …
+--chat-conversation …`). In the main thread, where the user ran `pi`
+interactively from a regular shell pane and then `/chat-connect`-ed, bare
+`respawn-pane -k` killed the running `pi` process and re-execed the pane's
+*original* start command — usually the user's shell — which crashed pi-chat
+and disconnected the chat. The current shared workaround avoids that failure
+mode by passing tmux an explicit `exec pi ... --session <current>
+--chat-conversation <current>` command.
 
 **Ask.**
 
@@ -90,12 +93,13 @@ same worker:
   `"This pi runtime does not expose ctx.reload()."` because the optional
   `ctx.reload` hook is undefined on the active pi runtime
   (`pi-ez-chat-extras/src/commands.ts`).
-- `tmux respawn-pane -k` — already removed from `pi-ez-chat-*` because it
+- bare `tmux respawn-pane -k` — removed from `pi-ez-chat-*` because it
   kills the user's pi session in the main pane.
 
-Net effect: extensions today have no in-VM way to reload, and the user has
-to run host-side `tmux kill-session ...` then re-`/chat-spawn-all`. That is
-the exact UX that motivates item 1.
+Net effect at the time: extensions had no safe in-VM reload. The current
+`pi-ez-lib` helper restores automatic reloads with an explicit respawn
+command, but item 1 is still the desired upstream fix because it would avoid
+tmux and the post-reply sleep race entirely.
 
 **Source receipts.**
 
